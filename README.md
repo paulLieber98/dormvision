@@ -1,5 +1,5 @@
 <<<<<<< HEAD
-# Ansh & Riley Full-Stack Template
+# Paul Lieber DormVision
 
 This is a full-stack template project for Software Composers to create  applications with AI.
 
