@@ -47,7 +47,7 @@ export const deleteDocument = (collectionName: string, id: string) =>
   deleteDoc(doc(db, collectionName, id));
 
 // Storage functions
-async function resizeImage(file: File, maxWidth: number, maxHeight: number): Promise<Blob> {
+export async function resizeImage(file: File, maxWidth: number, maxHeight: number): Promise<Blob> {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -86,7 +86,7 @@ async function resizeImage(file: File, maxWidth: number, maxHeight: number): Pro
 }
 
 export const uploadFile = async (file: File, path: string) => {
-  const resizedImage = await resizeImage(file, 800, 800); // Resize to 800x800 max while maintaining aspect ratio
+  const resizedImage = await resizeImage(file, 800, 800);
   const storageRef = ref(storage, path);
   await uploadBytes(storageRef, resizedImage);
   return getDownloadURL(storageRef);

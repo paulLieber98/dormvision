@@ -3,7 +3,7 @@ import React from 'react';
 const LoadingBar: React.FC = () => {
   return (
     <div className="mt-4">
-      <div className="w-full h-2 bg-gray-200 rounded-full">
+      <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
         <div
           className="h-full bg-blue-500 rounded-full animate-pulse"
           style={{

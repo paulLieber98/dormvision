@@ -12,7 +12,7 @@ export interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   addFavorite: (imageUrl: string) => Promise<void>;
-  removeFavorite: (imageUrl: string) => Promise<void>;
+  removeFavorite: (imageId: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -68,13 +68,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  const removeFavorite = useCallback(async (imageUrl: string) => {
+  const removeFavorite = useCallback(async (imageId: string) => {
     if (user) {
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
-        favorites: arrayRemove(imageUrl)
+        favorites: arrayRemove(imageId)
       });
-      setFavorites(prev => prev.filter(url => url !== imageUrl));
+      setFavorites(prev => prev.filter(id => id !== imageId));
     }
   }, [user]);
 

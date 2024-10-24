@@ -1,38 +1,67 @@
 import Image from "next/image";
+import FavoriteButton from "./FavoriteButton";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { db } from "@/lib/firebase/firebase";
+import { doc, setDoc, deleteDoc } from "firebase/firestore";
 import { useState } from "react";
-import { useAuth } from "../lib/hooks/useAuth";
 
 interface TransformedImageProps {
   imageUrl: string;
+  width: number;
+  height: number;
+  prompt?: string;
 }
 
-export default function TransformedImage({ imageUrl }: TransformedImageProps) {
-  const { user, addFavorite, removeFavorite, favorites } = useAuth();
-  const [isFavorite, setIsFavorite] = useState(favorites.includes(imageUrl));
+export default function TransformedImage({ imageUrl, width, height, prompt }: TransformedImageProps) {
+  const { user } = useAuth();
+  const [uniqueId] = useState(`${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
 
-  const handleFavoriteToggle = async () => {
-    if (isFavorite) {
-      await removeFavorite(imageUrl);
-    } else {
-      await addFavorite(imageUrl);
+  const handleToggleFavorite = async (imageId: string, isFavorited: boolean) => {
+    if (!user) return;
+    
+    try {
+      const favoriteRef = doc(db, 'users', user.uid, 'favorites', uniqueId);
+      
+      if (isFavorited) {
+        // Only include prompt if it exists
+        const docData = {
+          id: uniqueId,
+          imageUrl,
+          createdAt: new Date().toISOString(),
+          width,
+          height,
+          ...(prompt && { prompt }) // Only add prompt if it exists
+        };
+        
+        await setDoc(favoriteRef, docData);
+      } else {
+        await deleteDoc(favoriteRef);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
     }
-    setIsFavorite(!isFavorite);
   };
 
   return (
-    <div className="mt-8 relative">
-      <h2 className="text-2xl font-bold mb-4">Transformed Dorm Room</h2>
-      <Image src={imageUrl} alt="Transformed Dorm Room" width={500} height={500} className="rounded-lg" />
-      {user && (
-        <button
-          onClick={handleFavoriteToggle}
-          className={`mt-2 px-4 py-2 rounded ${
-            isFavorite ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600"
-          } text-white`}
-        >
-          {isFavorite ? "Unfavorite" : "Favorite"}
-        </button>
-      )}
+    <div className="mt-8">
+      <h2 className="text-2xl font-bold mb-4 text-blue-400">Transformed Dorm Room</h2>
+      <div className="relative">
+        <Image 
+          src={imageUrl}
+          alt="Transformed Dorm Room" 
+          width={width}
+          height={height}
+          style={{
+            width: '100%',
+            height: 'auto',
+          }}
+          className="rounded-lg"
+        />
+        <FavoriteButton
+          imageId={uniqueId}
+          onToggleFavorite={handleToggleFavorite}
+        />
+      </div>
     </div>
   );
 }

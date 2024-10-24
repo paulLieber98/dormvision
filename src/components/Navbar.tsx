@@ -4,44 +4,58 @@ import Link from 'next/link';
 import { useAuth } from '../lib/hooks/useAuth';
 
 export default function Navbar() {
-  const { user, loading, signInWithGoogle, signOut } = useAuth();
-
-  if (loading) {
-    return <nav className="bg-gray-800 p-4">Loading...</nav>;
-  }
+  const { user, signOut } = useAuth();
 
   return (
-    <nav className="bg-gray-800 p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="text-white text-2xl font-bold">
-          DormVision
+    <header className="sticky top-0 z-50 w-full border-b border-gray-800 bg-gray-900">
+      <div className="container mx-auto px-4 flex h-16 items-center justify-between">
+        <Link className="flex items-center space-x-2" href="/">
+          <span className="font-bold text-blue-400 text-lg">DormVision</span>
         </Link>
-        <div className="flex items-center">
-          {user && (
-            <Link href="/favorites" className="text-white mr-4 hover:text-gray-300">
-              Favorites
-            </Link>
-          )}
+        <nav className="flex items-center space-x-4">
+          <Link 
+            href="/transform" 
+            className="text-xs font-medium text-gray-400 border border-gray-700 rounded-full px-3 py-1 hover:border-blue-400 hover:text-blue-400 transition-colors"
+          >
+            Transform Room
+          </Link>
+          <Link 
+            href="/inspiration" 
+            className="text-xs font-medium text-gray-400 border border-gray-700 rounded-full px-3 py-1 hover:border-blue-400 hover:text-blue-400 transition-colors"
+          >
+            Inspiration Gallery
+          </Link>
+          <Link 
+            href="/favorites" 
+            className="text-xs font-medium text-gray-400 border border-gray-700 rounded-full px-3 py-1 hover:border-blue-400 hover:text-blue-400 transition-colors"
+          >
+            Favorites
+          </Link>
           {user ? (
-            <div className="flex items-center">
-              <span className="text-white mr-4">Welcome, {user.displayName}</span>
+            <>
+              <Link 
+                href="/profile" 
+                className="text-xs font-medium text-gray-400 border border-gray-700 rounded-full px-3 py-1 hover:border-blue-400 hover:text-blue-400 transition-colors"
+              >
+                Welcome, {user.displayName || user.email}
+              </Link>
               <button
                 onClick={signOut}
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                className="text-xs font-medium text-white bg-red-600 rounded-full px-3 py-1 hover:bg-red-700 transition-colors"
               >
                 Sign Out
               </button>
-            </div>
+            </>
           ) : (
-            <button
-              onClick={signInWithGoogle}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            <Link 
+              href="/login" 
+              className="text-xs font-medium text-white bg-blue-600 rounded-full px-3 py-1 hover:bg-blue-700 transition-colors"
             >
-              Login / Sign Up
-            </button>
+              Sign In
+            </Link>
           )}
-        </div>
+        </nav>
       </div>
-    </nav>
+    </header>
   );
 }

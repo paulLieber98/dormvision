@@ -15,22 +15,22 @@ const UserPromptInput: React.FC<UserPromptInputProps> = ({ onPromptConfirm }) =>
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4">
-      <label htmlFor="customPrompt" className="block text-sm font-medium text-gray-700">
-        Customize your dorm room
+    <form onSubmit={handleSubmit} className="mt-6">
+      <label htmlFor="customPrompt" className="block text-sm font-medium text-gray-300 mb-2">
+        Customize your dorm room transformation
       </label>
-      <div className="mt-1 flex rounded-md shadow-sm">
+      <div className="flex">
         <input
           type="text"
           id="customPrompt"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          className="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-l-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300"
+          className="flex-grow px-3 py-2 bg-gray-800 border border-gray-700 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200"
           placeholder="e.g., add modern furniture, make the room brighter"
         />
         <button
           type="submit"
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           Confirm
         </button>

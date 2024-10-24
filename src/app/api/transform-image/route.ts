@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const imageUrl = `data:${image.type};base64,${base64Image}`;
 
     const output = await replicate.run(
-      "stability-ai/stable-diffusion-img2img:15a3689ee13b0d2616e98820eca31d4c3abcd36672df6afce5cb6feb1d66087d",
+      "adirik/interior-design:76604baddc85b1b4616e1c6475eca080da339c8875bd4996705440484a6eac38",
       {
         input: {
           image: imageUrl,
@@ -34,10 +34,13 @@ export async function POST(request: Request) {
       }
     );
 
-    if (Array.isArray(output) && output.length > 0) {
+    if (typeof output === 'string') {
+      return NextResponse.json({ transformedImageUrl: output });
+    } else if (Array.isArray(output) && output.length > 0) {
       return NextResponse.json({ transformedImageUrl: output[0] });
     } else {
-      throw new Error("Unexpected output format from Replicate API");
+      console.error("Unexpected output format from Replicate API:", output);
+      return NextResponse.json({ error: "Unexpected output format from Replicate API" }, { status: 500 });
     }
   } catch (error) {
     console.error("Error transforming image:", error);
