@@ -7,6 +7,7 @@ import { collection, query, onSnapshot, doc, deleteDoc } from "firebase/firestor
 import Image from "next/image";
 import FavoriteButton from "@/components/FavoriteButton";
 import LoadingBar from "@/components/LoadingBar";
+import RouteGuard from '@/components/RouteGuard';
 
 interface FavoriteImage {
   id: string;
@@ -62,7 +63,7 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200 p-8">
+    <div className="min-h-screen bg-slate-900 text-gray-200 p-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-blue-400">Your Favorite Transformations</h1>
         {favorites.length === 0 ? (

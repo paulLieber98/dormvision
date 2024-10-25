@@ -25,7 +25,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-950 text-gray-200">
+    <div className="flex flex-col min-h-screen bg-slate-900 text-gray-200">
       <main className="flex-grow container mx-auto px-4 py-8">
         <section className="text-center mb-16">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 text-blue-400">

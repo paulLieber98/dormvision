@@ -1,9 +1,15 @@
 "use client";
 
-import React, { createContext, useEffect, useState, useCallback } from "react";
-import { signInWithPopup, GoogleAuthProvider, signOut as firebaseSignOut, User } from "firebase/auth";
-import { auth, db } from "../firebase/firebase";
-import { doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import React, { createContext, useEffect, useState } from "react";
+import { 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  signOut as firebaseSignOut, 
+  User,
+  getAuth 
+} from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../firebase/firebase";
 
 export interface AuthContextType {
   user: User | null;
@@ -21,62 +27,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const auth = getAuth();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
-      if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          setFavorites(userDoc.data().favorites || []);
-        } else {
-          await setDoc(doc(db, "users", user.uid), { favorites: [] });
-        }
-      } else {
-        setFavorites([]);
-      }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth]);
 
-  const signInWithGoogle = useCallback(async () => {
+  const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      
+      // Google accounts are pre-verified
+      await setDoc(doc(db, 'users', result.user.uid), {
+        email: result.user.email,
+        createdAt: new Date().toISOString(),
+        favorites: [],
+        emailVerified: true
+      }, { merge: true });
+      
     } catch (error) {
-      console.error("Error signing in with Google", error);
+      console.error('Error signing in with Google:', error);
+      throw error;
     }
-  }, []);
+  };
 
-  const signOut = useCallback(async () => {
+  const signOut = async () => {
     try {
       await firebaseSignOut(auth);
     } catch (error) {
-      console.error("Error signing out", error);
+      console.error('Error signing out:', error);
+      throw error;
     }
-  }, []);
+  };
 
-  const addFavorite = useCallback(async (imageUrl: string) => {
-    if (user) {
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        favorites: arrayUnion(imageUrl)
-      });
-      setFavorites(prev => [...prev, imageUrl]);
-    }
-  }, [user]);
+  const addFavorite = async (imageUrl: string) => {
+    if (!user) return;
+    const newFavorites = [...favorites, imageUrl];
+    setFavorites(newFavorites);
+    // Add Firestore update logic here if needed
+  };
 
-  const removeFavorite = useCallback(async (imageId: string) => {
-    if (user) {
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        favorites: arrayRemove(imageId)
-      });
-      setFavorites(prev => prev.filter(id => id !== imageId));
-    }
-  }, [user]);
+  const removeFavorite = async (imageId: string) => {
+    if (!user) return;
+    const newFavorites = favorites.filter(id => id !== imageId);
+    setFavorites(newFavorites);
+    // Add Firestore update logic here if needed
+  };
 
   const value = {
     user,
@@ -88,5 +90,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     removeFavorite,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }

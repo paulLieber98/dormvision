@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/firebase';
@@ -36,14 +36,18 @@ export default function SignUpPage() {
       // Create the user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
+      // Send verification email
+      await sendEmailVerification(userCredential.user);
+      
       // Create a user document in Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         email: email,
         createdAt: new Date().toISOString(),
-        favorites: []
+        favorites: [],
+        emailVerified: false
       });
 
-      router.push('/transform'); // Redirect to transform page after successful signup
+      router.push('/verify-email'); // Redirect to verification page
     } catch (err: any) {
       let errorMessage = 'Failed to create an account';
       if (err.code === 'auth/email-already-in-use') {

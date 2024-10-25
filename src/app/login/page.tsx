@@ -110,27 +110,34 @@ export default function LoginPage() {
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
+
+          {/* Add the new note here */}
+          <p className="text-sm text-gray-400 text-center mt-2">
+            If you signed up with Google, please click the &apos;Sign in with Google&apos; button. 
+            If you registered using an email and password, use the traditional sign-in method above.
+          </p>
+
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="text-sm">
+              <Link href="/signup" className="font-medium text-blue-400 hover:text-blue-500">
+                Don't have an account? Sign up
+              </Link>
+            </div>
+            <div className="w-full flex items-center justify-center">
+              <div className="border-t border-gray-700 w-full"></div>
+              <span className="px-4 text-gray-400">or</span>
+              <div className="border-t border-gray-700 w-full"></div>
+            </div>
+            <button
+              onClick={handleGoogleSignIn}
+              type="button"
+              className="w-full px-4 py-2 bg-white text-gray-700 rounded-md hover:bg-gray-100 transition duration-300 flex items-center justify-center"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className="w-6 h-6 mr-2" />
+              Sign in with Google
+            </button>
+          </div>
         </form>
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="text-sm">
-            <Link href="/signup" className="font-medium text-blue-400 hover:text-blue-500">
-              Don't have an account? Sign up
-            </Link>
-          </div>
-          <div className="w-full flex items-center justify-center">
-            <div className="border-t border-gray-700 w-full"></div>
-            <span className="px-4 text-gray-400">or</span>
-            <div className="border-t border-gray-700 w-full"></div>
-          </div>
-          <button
-            onClick={handleGoogleSignIn}
-            type="button"
-            className="w-full px-4 py-2 bg-white text-gray-700 rounded-md hover:bg-gray-100 transition duration-300 flex items-center justify-center"
-          >
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className="w-6 h-6 mr-2" />
-            Sign in with Google
-          </button>
-        </div>
       </div>
     </div>
   );
