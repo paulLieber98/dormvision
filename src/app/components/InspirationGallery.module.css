@@ -1,24 +1,32 @@
 .inspirationGallery {
-  margin-top: 20px;
-  border: 1px solid #ccc;
+  width: 100%;
   padding: 20px;
+  background-color: rgb(17, 24, 39);
+  border-radius: 8px;
 }
 
 .galleryGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  width: 100%;
 }
 
 .galleryItem {
-  position: relative;
+  background-color: rgb(31, 41, 55);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.galleryItem:hover {
+  transform: translateY(-2px);
 }
 
 .galleryImage {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .removeButton {

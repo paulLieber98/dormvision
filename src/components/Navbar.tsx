@@ -31,29 +31,39 @@ export default function Navbar() {
           >
             Favorites
           </Link>
-          {user ? (
-            <>
-              <Link 
-                href="/profile" 
-                className="text-xs font-medium text-gray-400 border border-gray-700 rounded-full px-3 py-1 hover:border-blue-400 hover:text-blue-400 transition-colors"
-              >
-                Welcome, {user.displayName || user.email}
-              </Link>
-              <button
-                onClick={signOut}
-                className="text-xs font-medium text-white bg-red-600 rounded-full px-3 py-1 hover:bg-red-700 transition-colors"
-              >
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <Link 
-              href="/login" 
-              className="text-xs font-medium text-white bg-blue-600 rounded-full px-3 py-1 hover:bg-blue-700 transition-colors"
-            >
-              Sign In
-            </Link>
-          )}
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <Link 
+                  href="/profile" 
+                  className="text-xs font-medium text-gray-400 border border-gray-700 rounded-full px-3 py-1 hover:border-blue-400 hover:text-blue-400 transition-colors"
+                >
+                  Welcome, {user.displayName || user.email}
+                </Link>
+                <button
+                  onClick={signOut}
+                  className="text-xs font-medium text-white bg-red-600 rounded-full px-3 py-1 hover:bg-red-700 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
         </nav>
       </div>
     </header>

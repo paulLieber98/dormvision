@@ -45,7 +45,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { icon: <Upload className="w-8 h-8 text-blue-400" />, title: 'Upload your room photo', description: "Take a photo of your dorm room and upload it to our platform." },
-              { icon: <Wand2 className="w-8 h-8 text-blue-400" />, title: 'Receive AI design suggestions', description: "Our AI analyzes your space and provides tailored design ideas." },
+              { icon: <Wand2 className="w-8 h-8 text-blue-400" />, title: 'Transform your dorm room', description: "This AI tool reformats your room to maximize comfort and style." },
               { icon: <ShoppingBag className="w-8 h-8 text-blue-400" />, title: 'Get inspired by the gallery', description: "Customize your design and look at the inspiration gallery for ideas." }
             ].map((step, index) => (
               <div key={index} className="bg-gray-900 p-6 rounded-lg shadow-md border border-gray-800">

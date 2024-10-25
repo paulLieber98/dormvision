@@ -5,22 +5,47 @@ import { JetBrains_Mono } from 'next/font/google';
 import Link from 'next/link';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase/firebase';
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'] });
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { signInWithGoogle } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically handle the login logic
-    console.log('Login attempted with:', email, password);
-    // For now, we'll just use Google Sign-In
-    await signInWithGoogle();
-    router.push('/');
+    setLoading(true);
+    setError('');
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/transform');
+    } catch (err: any) {
+      let errorMessage = 'Failed to sign in';
+      if (err.code === 'auth/invalid-credential') {
+        errorMessage = 'Invalid email or password';
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address';
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      router.push('/transform');
+    } catch (err) {
+      setError('Failed to sign in with Google');
+    }
   };
 
   return (
@@ -34,7 +59,7 @@ export default function LoginPage() {
             Sign in to your account
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleEmailSignIn}>
           <div className="space-y-4 rounded-md shadow-sm">
             <div>
               <label htmlFor="email-address" className="sr-only">
@@ -70,12 +95,19 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {error && (
+            <div className="text-red-500 text-sm text-center">
+              {error}
+            </div>
+          )}
+
           <div>
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-300"
+              disabled={loading}
+              className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign in
+              {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>
@@ -85,8 +117,14 @@ export default function LoginPage() {
               Don't have an account? Sign up
             </Link>
           </div>
+          <div className="w-full flex items-center justify-center">
+            <div className="border-t border-gray-700 w-full"></div>
+            <span className="px-4 text-gray-400">or</span>
+            <div className="border-t border-gray-700 w-full"></div>
+          </div>
           <button
-            onClick={signInWithGoogle}
+            onClick={handleGoogleSignIn}
+            type="button"
             className="w-full px-4 py-2 bg-white text-gray-700 rounded-md hover:bg-gray-100 transition duration-300 flex items-center justify-center"
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className="w-6 h-6 mr-2" />

@@ -1,14 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    domains: ['localhost', 'placehold.co', 'replicate.com', 'replicate.delivery', 'firebasestorage.googleapis.com'],
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'placehold.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'replicate.delivery',
+        protocol: "https",
+        hostname: "**",
       },
     ],
     dangerouslyAllowSVG: true,
