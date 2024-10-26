@@ -19,13 +19,15 @@ export default function SignUpPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
+    // Enhanced password validation
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character');
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password should be at least 6 characters long');
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
@@ -39,21 +41,26 @@ export default function SignUpPage() {
       // Send verification email
       await sendEmailVerification(userCredential.user);
       
-      // Create a user document in Firestore
+      // Create a user document in Firestore with additional security measures
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         email: email,
         createdAt: new Date().toISOString(),
         favorites: [],
-        emailVerified: false
+        emailVerified: false,
+        lastPasswordChange: new Date().toISOString(),
+        failedLoginAttempts: 0,
+        accountLocked: false
       });
 
-      router.push('/verify-email'); // Redirect to verification page
+      router.push('/verify-email');
     } catch (err: any) {
       let errorMessage = 'Failed to create an account';
       if (err.code === 'auth/email-already-in-use') {
         errorMessage = 'An account with this email already exists';
       } else if (err.code === 'auth/invalid-email') {
         errorMessage = 'Invalid email address';
+      } else if (err.code === 'auth/weak-password') {
+        errorMessage = 'Password is too weak';
       }
       setError(errorMessage);
     } finally {

@@ -7,6 +7,8 @@ import { useAuth } from '../../lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase/firebase';
+import { db } from '@/lib/firebase/firebase';
+import { query, collection, getDocs, doc, updateDoc, where } from 'firebase/firestore';
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'] });
 
@@ -23,13 +25,63 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
+    // Move userDoc query outside try-catch
+    const userDocQuery = await getDocs(query(collection(db, 'users'), where('email', '==', email)));
+
     try {
+      if (!userDocQuery.empty) {
+        const userData = userDocQuery.docs[0].data();
+        
+        // Check if account is locked
+        if (userData.accountLocked) {
+          const lockTime = new Date(userData.lockTime);
+          const now = new Date();
+          const lockDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
+        
+          if (now.getTime() - lockTime.getTime() < lockDuration) {
+            setError('Account is temporarily locked. Please try again later or reset your password');
+            setLoading(false);
+            return;
+          } else {
+            // Reset lock if duration has passed
+            await updateDoc(doc(db, 'users', userDocQuery.docs[0].id), {
+              accountLocked: false,
+              failedLoginAttempts: 0
+            });
+          }
+        }
+      }
+
       await signInWithEmailAndPassword(auth, email, password);
+      
+      // Reset failed attempts on successful login
+      if (!userDocQuery.empty) {
+        await updateDoc(doc(db, 'users', userDocQuery.docs[0].id), {
+          failedLoginAttempts: 0
+        });
+      }
+      
       router.push('/transform');
     } catch (err: any) {
       let errorMessage = 'Failed to sign in';
       if (err.code === 'auth/invalid-credential') {
         errorMessage = 'Invalid email or password';
+        
+        // Increment failed attempts and potentially lock account
+        if (!userDocQuery.empty) {
+          const userData = userDocQuery.docs[0].data();
+          const newAttempts = (userData.failedLoginAttempts || 0) + 1;
+          
+          await updateDoc(doc(db, 'users', userDocQuery.docs[0].id), {
+            failedLoginAttempts: newAttempts,
+            accountLocked: newAttempts >= 5,
+            lockTime: newAttempts >= 5 ? new Date().toISOString() : null
+          });
+          
+          if (newAttempts >= 5) {
+            errorMessage = 'Too many failed attempts. Account temporarily locked for 30 minutes';
+          }
+        }
       } else if (err.code === 'auth/invalid-email') {
         errorMessage = 'Invalid email address';
       }
@@ -93,6 +145,15 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            {/* Add the forgot password link here */}
+            <div className="flex justify-end">
+              <Link
+                href="/reset-password"
+                className="text-sm text-blue-400 hover:text-blue-500 transition-colors"
+              >
+                Forgot your password?
+              </Link>
+            </div>
           </div>
 
           {error && (
@@ -134,7 +195,7 @@ export default function LoginPage() {
               className="w-full px-4 py-2 bg-white text-gray-700 rounded-md hover:bg-gray-100 transition duration-300 flex items-center justify-center"
             >
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" className="w-6 h-6 mr-2" />
-              Sign in with Google
+              Sign in / Sign up with Google
             </button>
           </div>
         </form>

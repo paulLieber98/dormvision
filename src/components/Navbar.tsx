@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '../lib/hooks/useAuth';
 
 export default function Navbar() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-800 bg-gray-900">
@@ -33,20 +33,12 @@ export default function Navbar() {
           </Link>
           <div className="flex items-center gap-4">
             {user ? (
-              <>
-                <Link 
-                  href="/profile" 
-                  className="text-xs font-medium text-gray-400 border border-gray-700 rounded-full px-3 py-1 hover:border-blue-400 hover:text-blue-400 transition-colors"
-                >
-                  Welcome, {user.displayName || user.email}
-                </Link>
-                <button
-                  onClick={signOut}
-                  className="text-xs font-medium text-white bg-red-600 rounded-full px-3 py-1 hover:bg-red-700 transition-colors"
-                >
-                  Sign Out
-                </button>
-              </>
+              <Link 
+                href="/profile" 
+                className="text-xs font-medium text-gray-400 border border-gray-700 rounded-full px-3 py-1 hover:border-blue-400 hover:text-blue-400 transition-colors"
+              >
+                Welcome, {user.displayName || user.email}
+              </Link>
             ) : (
               <>
                 <Link

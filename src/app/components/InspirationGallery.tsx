@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import styles from './InspirationGallery.module.css';
+import BeforeAfterSlider from './BeforeAfterSlider';
 
 // Only use the inspo_ prefixed images
 const imagePairs = [
@@ -13,52 +13,28 @@ const imagePairs = [
 ];
 
 const InspirationGallery: React.FC = () => {
-  const [imageLoadError, setImageLoadError] = React.useState<Record<string, boolean>>({});
-
-  const handleImageError = (path: string) => {
-    console.error(`Failed to load image: ${path}`);
-    setImageLoadError(prev => ({ ...prev, [path]: true }));
-  };
-
   return (
-    <div className={styles.inspirationGallery}>
-      <h2 className="text-3xl font-bold text-blue-400 mb-6">Inspiration Gallery</h2>
-      <div className={styles.galleryGrid}>
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <h2 className="text-3xl font-bold text-blue-400 mb-12 text-center">
+        Inspiration Gallery
+      </h2>
+      <div className="space-y-24">
         {imagePairs.map((pair, index) => (
-          <div key={index} className={styles.galleryItem}>
-            <div className="flex flex-col gap-4 p-4">
-              <div className="relative h-[200px] w-full bg-gray-800 rounded-lg overflow-hidden">
-                {!imageLoadError[pair.before] && (
-                  <Image 
-                    src={pair.before} 
-                    alt={`Before ${index + 1}`} 
-                    fill
-                    className="object-cover rounded-lg transition-opacity duration-300 hover:opacity-90"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    onError={() => handleImageError(pair.before)}
-                    priority={index === 0}
-                  />
-                )}
-                <span className="absolute bottom-2 left-2 bg-gray-900/80 text-blue-400 px-2 py-1 rounded-full text-sm">
-                  Before
-                </span>
-              </div>
-              <div className="relative h-[200px] w-full bg-gray-800 rounded-lg overflow-hidden">
-                {!imageLoadError[pair.after] && (
-                  <Image 
-                    src={pair.after} 
-                    alt={`After ${index + 1}`} 
-                    fill
-                    className="object-cover rounded-lg transition-opacity duration-300 hover:opacity-90"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    onError={() => handleImageError(pair.after)}
-                    priority={index === 0}
-                  />
-                )}
-                <span className="absolute bottom-2 left-2 bg-gray-900/80 text-blue-400 px-2 py-1 rounded-full text-sm">
-                  After
-                </span>
-              </div>
+          <div key={index} className="max-w-3xl mx-auto">
+            <div className="mb-6">
+              <h3 className="text-xl text-gray-200 mb-2">
+                Transformation {index + 1}
+              </h3>
+              <p className="text-gray-400">
+                Swipe or drag the slider to see the transformation
+              </p>
+            </div>
+            <div className="shadow-2xl rounded-lg overflow-hidden">
+              <BeforeAfterSlider
+                beforeImage={pair.before}
+                afterImage={pair.after}
+                alt={`Room transformation ${index + 1}`}
+              />
             </div>
           </div>
         ))}

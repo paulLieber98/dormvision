@@ -23,14 +23,13 @@ export default function TransformedImage({ imageUrl, width, height, prompt }: Tr
       const favoriteRef = doc(db, 'users', user.uid, 'favorites', uniqueId);
       
       if (isFavorited) {
-        // Only include prompt if it exists
         const docData = {
           id: uniqueId,
           imageUrl,
           createdAt: new Date().toISOString(),
           width,
           height,
-          ...(prompt && { prompt }) // Only add prompt if it exists
+          ...(prompt && { prompt })
         };
         
         await setDoc(favoriteRef, docData);
@@ -45,15 +44,17 @@ export default function TransformedImage({ imageUrl, width, height, prompt }: Tr
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-bold mb-4 text-blue-400">Transformed Dorm Room</h2>
-      <div className="relative">
+      <div className="relative max-w-md mx-auto">
         <Image 
           src={imageUrl}
           alt="Transformed Dorm Room" 
-          width={width}
-          height={height}
+          width={512}
+          height={512}
           style={{
             width: '100%',
             height: 'auto',
+            maxHeight: '512px',
+            objectFit: 'contain',
           }}
           className="rounded-lg"
         />
