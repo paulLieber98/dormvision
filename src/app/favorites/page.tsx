@@ -18,7 +18,7 @@ interface FavoriteImage {
   height: number;
 }
 
-export default function FavoritesPage() {
+function FavoritesContent() {
   const [favorites, setFavorites] = useState<FavoriteImage[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -54,14 +54,6 @@ export default function FavoritesPage() {
 
   if (loading) return <LoadingBar />;
 
-  if (!user) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-gray-950">
-        <p className="text-gray-200">Please log in to view your favorites</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-slate-900 text-gray-200 p-8">
       <div className="max-w-6xl mx-auto">
@@ -93,5 +85,13 @@ export default function FavoritesPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function FavoritesPage() {
+  return (
+    <RouteGuard>
+      <FavoritesContent />
+    </RouteGuard>
   );
 }
